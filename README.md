@@ -1,4 +1,4 @@
-# PUBG-Radar 
+# PUBG-Radar [NOT WORKING]
 ![Imgur](https://image.ibb.co/gsFrPc/image.png)
 
 ### Скачать скомпилированную версию
