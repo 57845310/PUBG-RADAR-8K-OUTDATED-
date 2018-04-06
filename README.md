@@ -1,51 +1,51 @@
-# PUBG-Radar [NOT WORKING]
-![Imgur](https://image.ibb.co/gsFrPc/image.png)
+#### CURRENTLY OUTDATED
 
-### Скачать скомпилированную версию
+#### By engaging with this repository you explicitly agree with the terms of the Unlicense.
 
-https://github.com/FutureXpo/PUBG-RADAR-8K/releases
+![Imgur](https://i.imgur.com/PDjwkyR.jpg)
 
-# Возможны ошибки в работе
-При использовании Radar launcher возможны ошибки и остановка программы
 
-### Небольшая заметка
->Нельзя фильтровать третий сет брони и пламегаситель на AR
->Большие иконки airdrop
->Команда отмечена другим цветом
+VMRadar Website located here -> https://vmradar.net/
 
-#### Item Filter - Фильтры:
-* Filter Weapon - Показать/Скрыть оружие
-* Filter Attachments - Показать/Скрыть обвесы
-* Filter Scopes - Показать/Скрыть прицелы
-* Filter Ammo - Показать/Скрыть патроны
-* Filter Level 2 - Показать/Скрыть броню второго уровня
-* Filter Heals - Показать/Скрыть хилы
-* Filter Grenades - Показать/Скрыть гранаты
+Discord Was Taken Down ToS Violation apparently
 
-#### Zooms - Масштаб карты:
-* NUMPAD_8 -> Лут - Поиск машины - Удобное вождение
-* NUMPAD_PLUS ->  Zoom+ - Приблизить
-* NUMPAD_MINUS -> Zoom- - Отдалить
+SDK Dumped by (legitnutty33) Thank You!
 
-#### UI - Интерфейс:
-* F1 -> Change Player Info (Name, Distance, HP, Weapon) - Изменить выводимую информацию(Имя, расстояние, здоровье, оружие)
-* F2 -> Toggle Compass - Компасс(выводить/нет)
-* F3 -> Toggle Grind (100m)
+
+#### Item Filter:
+* NUMPAD_1 -> Filter Weapon
+* NUMPAD_2 -> Filter Equip
+* NUMPAD_3 -> Filter Meds
+* NUMPAD_4 -> Filter Attach
+* NUMPAD_5 -> Filter Scope
+* NUMPAD_6 -> Filter Ammo
+* NUMPAD_0 -> Filter Throw
+
+#### Zooms:
+* NUMPAD_8 -> Looting - Combat -Scouting
+* NUMPAD_PLUS ->  Camera Zoom ++
+* NUMPAD_MINUS -> Camera Zoom --
+
+#### Other
+* F1 -> Change Player Info (Name, Distance, HP, Weapon)
+* F2 -> Toggle Compass
+* F3 -> Toggle Mini Map
 * F4 -> Toggle View Line
-* F5 -> Toggle Vehicles (icon, name or both) - Выводить информацию о транспорте(Картинка, название)
+* F5 -> Toggle Vehicles (icon, name or both)
+* F12 -> Toggle View Line
 
 
-## How to: Build, Install and RUN PUBG Radar
-https://youtu.be/H_gud8xuP-s
 
 ### Online Mode:
-`java -jar target\pubg-radar-1.0-SNAPSHOT-jar-with-dependencies.jar "Middle PC IP" PortFilter "Game PC IP"`
+`java -jar target\VMRadar-1.2.1-jar-with-dependencies.jar "Middle PC IP" PortFilter "Game PC IP"`
 
 ### Offline Mode:
 You can replay a PCAP file in offline mode:
 
-`java -jar target\pubg-radar-1.0-SNAPSHOT-jar-with-dependencies.jar "Middle PC IP" PortFilter "Game PC IP" Offline`
+`java -jar target\VMRadar-1.2.1-jar-with-dependencies.jar "Middle PC IP" PortFilter "Game PC IP" Offline`
 
+## How to: Build, Install and RUN MINECRAFT Radar
+https://youtu.be/uppdw51DiZQ
 
 ## Build
 
@@ -87,13 +87,13 @@ Use Windows 7 ultimate when installing
 
 #### No need to set up VPN using this method!
 
-#### If you have OpenGL error try this:
+#### If you have "GLFW_PLATFORM_ERROR" try this:
 
 1. Press windows + r
 2. Type in msconfig and press enter
 3. Go to 'boot' and check 'safe boot'
 4. Apply/ok and restart VM (it will boot in safe mode)
-5. Go to VirtualBox toolbar and go to Devices -> Insert Guest Additions CD image... https://linuxclub.cs.byu.edu/downloads/tools/virtualization/virtualbox/5.1.30/VBoxGuestAdditions_5.1.30.iso
+5. Go to VirtualBox toolbar and go to Devices -> Insert Guest Additions CD image...
 6. Press Windows + E and open the CD drive for guest additions
 7. Install, select Direct3D support when installing! Do not reboot after installation.
 8. Go to msconfig, boot, disable safe boot and restart to normal windows
@@ -134,7 +134,8 @@ User and Password as the ones you created earlier and now click save.
 
 Now try to connect to your VPN and if it succeeded you are ready to go
 
-#### Some image for both methods: https://docs.google.com/document/d/1hrmnwMoVWmH7GTRwHEeOpGHgehKsETgJRQTacAtgIHQ
+#### Read the Guide thats provided
+Located in the Help folder
 
 ## Run
 -----------------

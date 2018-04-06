@@ -1,6 +1,6 @@
 target/
 .idea
-logall.txt
+log.txt
 *.json
 *.rar
 *.zip

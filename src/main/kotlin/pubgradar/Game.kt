@@ -1,7 +1,7 @@
 package pubgradar
 
-import pubgradar.util.settings.Settings
 import pubgradar.ui.GLMap
+import pubgradar.util.settings.Settings
 import java.util.Collections.newSetFromMap
 import java.util.concurrent.ConcurrentHashMap
 
@@ -13,62 +13,64 @@ var isErangel = true
 
 interface GameListener
 {
-   fun onGameOver()
+  fun onGameOver()
 }
 
-private val gameListeners = newSetFromMap(ConcurrentHashMap<GameListener , Boolean>())
+private val gameListeners = newSetFromMap(ConcurrentHashMap<GameListener, Boolean>())
 
 fun register(gameListener : GameListener)
 {
-   gameListeners.add(gameListener)
+  gameListeners.add(gameListener)
 }
 
 fun deregister(gameListener : GameListener)
 {
-   gameListeners.remove(gameListener)
+  gameListeners.remove(gameListener)
 }
 
 fun gameStart()
 {
-   println("New Game on")
+  println("New Game is Starting")
 
-   gameStarted = true
+  gameStarted = true
 }
 
 fun gameOver()
 {
-   gameStarted = false
-   gameListeners.forEach { it.onGameOver() }
+  gameStarted = false
+  gameListeners.forEach { it.onGameOver() }
 }
 
 lateinit var Args : Array<String>
 fun main(args : Array<String>)
 {
-   Args = args
-   when
-   {
-      args.size < 3 ->
-      {
-         println("usage: <ip> <sniff option> <gaming pc>")
-         System.exit(- 1)
+  Args = args
+  when
+  {
+    args.size < 3 ->
+    {
+      println("Online usage: <ip> <sniff option> <gaming pc>")
 
-      }
-      args.size > 3 ->
-      {
+      println("Offline usage: <ip> <sniff option> <gaming pc> <offline.pcap>")
+      System.exit(-1)
 
-         println("Loading PCAP File.")
+    }
+    args.size > 3 ->
+    {
 
-         Sniffer.sniffLocationOffline()
-         val jsettings = Settings()
-         val ui = GLMap(jsettings.loadsettings())
-         ui.show()
-      }
-      else          ->
-      {
-         Sniffer.sniffLocationOnline()
-         val jsettings = Settings()
-         val ui = GLMap(jsettings.loadsettings())
-         ui.show()
-      }
-   }
+      println("Loading PCAP File.. " + args[3])
+
+      Sniffer.sniffLocationOffline(args[3])
+      val jsettings = Settings()
+      val ui = GLMap(jsettings.loadsettings())
+      ui.show()
+    }
+    else          ->
+    {
+      Sniffer.sniffLocationOnline()
+      val jsettings = Settings()
+      val ui = GLMap(jsettings.loadsettings())
+      ui.show()
+    }
+  }
 }
