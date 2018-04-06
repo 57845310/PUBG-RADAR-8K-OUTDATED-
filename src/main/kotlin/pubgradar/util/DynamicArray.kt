@@ -9,7 +9,7 @@ class DynamicArray<T : Any?>(size : Int) : Iterable<T>
       resize(size)
    }
 
-   private var elementData = Array<Any?>(size) { null }
+   private var elementData = Array<Any?>(size+1) { null }
 
    var size : Int = size
       private set(value)
