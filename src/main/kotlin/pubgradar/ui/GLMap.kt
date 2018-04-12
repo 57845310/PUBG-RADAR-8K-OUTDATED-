@@ -112,7 +112,7 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
 
   fun show() {
     val config = Lwjgl3ApplicationConfiguration()
-    config.setTitle("")
+    config.setTitle("[${localAddr.hostAddress} ${sniffOption.name}] - VMRadar v1.2.1")
     config.setWindowIcon(Files.FileType.Internal, "icon.png")
     config.useOpenGL3(false, 2, 1)
     config.setWindowedMode(initialWindowWidth.toInt(), initialWindowWidth.toInt())
@@ -146,7 +146,6 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
   lateinit var markerAtlas: TextureAtlas
   lateinit var markers: Array<TextureRegion>
   private lateinit var parachute: Texture
-  private lateinit var vehicleicon: Texture
   private lateinit var teamarrow: Texture
   private lateinit var teamsight: Texture
   private lateinit var arrow: Texture
@@ -200,6 +199,10 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
 
   // Please change your pre-build settings in Settings.kt
   // You can change them in Settings.json after you run the game once too.
+
+  // private var toggleVehicles = -1
+  //  private var toggleVNames = -1
+
   private var nameToggles = jsettings.nameToggles
   private var VehicleInfoToggles = jsettings.VehicleInfoToggles
   private var ZoomToggles = jsettings.ZoomToggles
@@ -279,11 +282,11 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
     } else {
       if (mapCamera.zoom < 0.01f) {
         mapCamera.zoom = 0.01f
-      //  println("Max Zoom")
+        println("Max Zoom")
       }
       if (mapCamera.zoom > 1f) {
         mapCamera.zoom = 1f
-      //  println("Min Zoom")
+        println("Min Zoom")
       }
     }
 
@@ -295,7 +298,7 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
       RIGHT -> {
         pinLocation.set(pinLocation.set(screenX.toFloat(), screenY.toFloat()).windowToMap())
         camera.update()
-        println(pinLocation)
+        //println(pinLocation)
         return true
       }
       LEFT -> {
@@ -468,7 +471,7 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
     teamarrow = Texture(Gdx.files.internal("images/team.png"))
     parachute = Texture(Gdx.files.internal("images/parachute.png"))
 
-    vehicleicon = Texture(Gdx.files.internal("images/vehicle.png"))
+    parachute = Texture(Gdx.files.internal("images/parachute.png"))
 
     itemAtlas = TextureAtlas(Gdx.files.internal("icons/itemIcons.txt"))
     for (region in itemAtlas.regions)
@@ -709,6 +712,7 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
         hubFont.draw(spriteBatch, "$NumAliveTeams", windowWidth - 240f - layout.width / 2, windowHeight - 29f)
       }
       if (isTeamMatch) {
+
         layout.setText(hubFont, zero)
         spriteBatch.draw(hubpanel, windowWidth - 390f, windowHeight - 60f)
         hubFontShadow.draw(spriteBatch, "KILLS", windowWidth - 345f, windowHeight - 29f)
@@ -881,12 +885,14 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
 
         // Compass
         if (drawcompass != 1)
+
           menuFontOFF.draw(spriteBatch, "Disabled", 187f, windowHeight / 2 + -107f)
         else
           menuFontOn.draw(spriteBatch, "Enabled", 187f, windowHeight / 2 + -107f)
 
 
         if (drawDaMap == 1)
+
           menuFontOn.draw(spriteBatch, "Enabled", 187f, windowHeight / 2 + -125f)
         else
           menuFontOFF.draw(spriteBatch, "Disabled", 187f, windowHeight / 2 + -125f)
@@ -944,7 +950,7 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
       }
       drawCircles()
       drawAttackLine()
-    //  drawAirDropLine()
+      drawAirDropLine()
     }
 
     draw(Filled) {
@@ -970,13 +976,16 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
     //draw self
     // drawAllPlayerHealth(selfColor , tuple4(actors[selfID] ?: return , selfCoords.x , selfCoords.y , selfDirection))
     players?.forEach {
+
       drawAllPlayerHealth(playerColor, it)
+
     }
     drawAllPlayerHealth(selfColor, tuple4(actors[selfID] ?: return, selfCoords.x, selfCoords.y, selfDirection))
   }
 
 
   private fun ShapeRenderer.DrawMyselfH() {
+
     drawAllPlayerHealth(selfColor, tuple4(actors[selfID] ?: return, selfCoords.x, selfCoords.y, selfDirection))
   }
 
@@ -1012,8 +1021,13 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
       val PlayerState = actors[playerStateGUID] as? PlayerState ?: return@forEach
       val selfStateGUID = actorWithPlayerState[selfID] ?: return@forEach
       val selfState = actors[selfStateGUID] as? PlayerState ?: return@forEach
-	  
+
+
+      // val teamId = isTeamMate(actor)
+      //println(teamId)
+      // if (teamId > 0) {
       if (PlayerState.teamNumber == selfState.teamNumber) {
+        // Can't wait for the "Omg Players don't draw issues
         spriteBatch.draw(
                 teamarrow,
                 sx, windowHeight - sy - 2, 4.toFloat() / 2,
@@ -1065,13 +1079,15 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
   private fun drawMyself(actorInfo: renderInfo) {
     val (actor, x, y, dir) = actorInfo
     val (sx, sy) = Vector2(x, y).mapToWindow()
-	spriteBatch.draw(
-            player,
-            sx, windowHeight - sy - 2, 4.toFloat() / 2,
-            4.toFloat() / 2, 4.toFloat(), 4.toFloat(), 5f, 5f,
-            dir * -1, 0, 0, 64, 64, true, false
-    )
     if (toggleView == 1) {
+      // Just draw them both at the same time to avoid player not drawing ¯\_(ツ)_/¯
+      spriteBatch.draw(
+              player,
+              sx, windowHeight - sy - 2, 4.toFloat() / 2,
+              4.toFloat() / 2, 4.toFloat(), 4.toFloat(), 5f, 5f,
+              dir * -1, 0, 0, 64, 64, true, false
+      )
+
       spriteBatch.draw(
               playersight,
               sx + 1, windowHeight - sy - 2,
@@ -1081,7 +1097,15 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
               10f, 10f,
               dir * -1, 0, 0, 512, 64, true, false
       )
-    } 
+    } else {
+
+      spriteBatch.draw(
+              player,
+              sx, windowHeight - sy - 2, 4.toFloat() / 2,
+              4.toFloat() / 2, 4.toFloat(), 4.toFloat(), 5f, 5f,
+              dir * -1, 0, 0, 64, 64, true, false
+      )
+    }
   }
 
   private fun SpriteBatch.drawMapMarkers() {
@@ -1170,7 +1194,7 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
       drawVehicles(vehicles)
       drawAirDrop()
       drawMapMarkers()
-    //  drawItem()
+      drawItem()
     }
     shapeRenderer.projectionMatrix = miniMapCamera.combined
     Gdx.gl.glEnable(GL20.GL_BLEND)
@@ -1367,7 +1391,7 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
   private fun SpriteBatch.drawItem() {
     // This makes the array empty if the filter is off for performance with an inverted function since arrays are expensive
     scopesToFilter = if (filterScope != 1) {
-      arrayListOf("Item_Attach_Weapon_Upper_Holosight_C", "Item_Attach_Weapon_Upper_DotSight_01_C")
+      arrayListOf("")
     } else {
       arrayListOf(
               "Item_Attach_Weapon_Upper_Holosight_C",
@@ -1380,13 +1404,7 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
 
 
     attachToFilter = if (filterAttach != 1) {
-      arrayListOf("Item_Attach_Weapon_Magazine_Extended_SniperRifle_C" ,
-					 "Item_Attach_Weapon_Magazine_Extended_Large_C" ,
-					 "Item_Attach_Weapon_Magazine_Extended_Medium_C" ,
-					 "Item_Attach_Weapon_Muzzle_FlashHider_Medium_C" ,
-					 "Item_Attach_Weapon_Muzzle_FlashHider_Large_C" ,
-					 "Item_Attach_Weapon_Lower_AngledForeGrip_C"
-					 )
+      arrayListOf("")
     } else {
       arrayListOf(
               "Item_Attach_Weapon_Magazine_ExtendedQuickDraw_SniperRifle_C",
@@ -1410,11 +1428,7 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
     }
 
     weaponsToFilter = if (filterWeapon != 1) {
-      arrayListOf("Item_Weapon_G18_C" ,
-			 "Item_Weapon_Rhino_C" ,
-			 "Item_Weapon_M1911_C" ,
-             "Item_Weapon_NagantM1895_C" ,
-             "Item_Weapon_M9_C")
+      arrayListOf("")
     } else {
       arrayListOf(
               "Item_Weapon_AWM_C",
@@ -1429,7 +1443,46 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
               "Item_Weapon_Mini14_C",
               "Item_Weapon_M16A4_C",
               "Item_Weapon_SKS_C",
-              "Item_Weapon_AK47_C",
+              "Item_Weapon_AK47_C"
+      )
+    }
+
+    healsToFilter = if (filterHeals != 1) {
+      arrayListOf("")
+    } else {
+      arrayListOf(
+              "Item_Heal_Bandage_C",
+              "Item_Heal_MedKit_C",
+              "Item_Heal_FirstAid_C",
+              "Item_Boost_PainKiller_C",
+              "Item_Boost_EnergyDrink_C",
+              "Item_Boost_AdrenalineSyringe_C"
+      )
+    }
+
+    ammoToFilter = if (filterAmmo != 1) {
+      arrayListOf("")
+    } else {
+      arrayListOf(
+              "Item_Ammo_762mm_C",
+              "Item_Ammo_556mm_C",
+              "Item_Ammo_300Magnum_C",
+              "Item_Weapon_Pan_C"
+      )
+    }
+
+    throwToFilter = if (filterThrow != 1) {
+      arrayListOf("")
+    } else {
+      arrayListOf(
+              "Item_Weapon_Grenade_C",
+              "Item_Weapon_FlashBang_C",
+              "Item_Weapon_SmokeBomb_C",
+              "Item_Weapon_Molotov_C",
+              "Item_Ammo_9mm_C",
+              "Item_Ammo_45ACP_C",
+              "Item_Ammo_Flare_C",
+              "Item_Ammo_12Guage_C",
               "Item_Weapon_DP28_C",
               "Item_Weapon_Saiga12_C",
               "Item_Weapon_UMP_C",
@@ -1447,45 +1500,6 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
               "Item_Weapon_M1911_C",
               "Item_Weapon_NagantM1895_C",
               "Item_Weapon_M9_C"
-      )
-    }
-
-    healsToFilter = if (filterHeals != 1) {
-      arrayListOf("Item_Heal_Bandage_C")
-    } else {
-      arrayListOf(
-              "Item_Heal_Bandage_C",
-              "Item_Heal_MedKit_C",
-              "Item_Heal_FirstAid_C",
-              "Item_Boost_PainKiller_C",
-              "Item_Boost_EnergyDrink_C",
-              "Item_Boost_AdrenalineSyringe_C"
-      )
-    }
-
-    ammoToFilter = if (filterAmmo != 1) {
-      arrayListOf("Item_Ammo_45ACP_C","Item_Ammo_12Guage_C")
-    } else {
-      arrayListOf(
-              "Item_Ammo_762mm_C",
-              "Item_Ammo_556mm_C",
-              "Item_Ammo_300Magnum_C",
-              "Item_Weapon_Pan_C",
-              "Item_Ammo_9mm_C",
-              "Item_Ammo_45ACP_C",
-              "Item_Ammo_Flare_C",
-              "Item_Ammo_12Guage_C"
-      )
-    }
-
-    throwToFilter = if (filterThrow != 1) {
-      arrayListOf("Item_Weapon_FlashBang_C")
-    } else {
-      arrayListOf(
-              "Item_Weapon_Grenade_C",
-              "Item_Weapon_FlashBang_C",
-              "Item_Weapon_SmokeBomb_C",
-              "Item_Weapon_Molotov_C"
       )
     }
 
@@ -1672,7 +1686,7 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
 
         } else {
           draw(icon, x, y, 0f, scale, it._3)
-        println(itemHeight)
+        //println(itemHeight)
         }
       }
           when {
@@ -1930,6 +1944,31 @@ class GLMap(private val jsettings : Settings.jsonsettings) : InputAdapter(), App
     if (!clipBound.contains(x, y)) return
     val zoom = camera.zoom
     val backgroundRadius = (playerRadius + 2000f) * zoom
+
+//        val attach = actor.attachChildren.firstOrNull()
+//        val teamId = isTeamMate(actor)
+//        color = when {
+//            teamId >= 0 -> teamColor[teamId]
+//            attach == null -> pColor
+//            attach == selfID -> selfColor
+//            else -> {
+//                val teamId = isTeamMate(actors[attach])
+//                if (teamId >= 0)
+//                    teamColor[teamId]
+//                else
+//                    pColor
+//            }
+//        }
+//        if (actor is Character)
+//            color = when {
+//                actor.isGroggying -> {
+//                    GRAY
+//                }
+//                actor.isReviving -> {
+//                    WHITE
+//                }
+//                else -> color
+//            }
 
     if (actor is Character)
     {//draw health

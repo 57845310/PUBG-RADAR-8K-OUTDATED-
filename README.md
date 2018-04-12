@@ -1,16 +1,6 @@
-#### CURRENTLY OUTDATED
 
-#### By engaging with this repository you explicitly agree with the terms of the Unlicense.
 
 ![Imgur](https://i.imgur.com/PDjwkyR.jpg)
-
-
-VMRadar Website located here -> https://vmradar.net/
-
-Discord Was Taken Down ToS Violation apparently
-
-SDK Dumped by (legitnutty33) Thank You!
-
 
 #### Item Filter:
 * NUMPAD_1 -> Filter Weapon

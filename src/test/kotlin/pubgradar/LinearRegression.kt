@@ -3,7 +3,8 @@ package pubgradar
 import org.apache.commons.io.IOUtils
 import org.apache.commons.math3.stat.regression.SimpleRegression
 
-fun main(args: Array<String>) {
+fun main(args : Array<String>)
+{
   val x_LR = SimpleRegression()
   val y_LR = SimpleRegression()
 //  val func = { x: Double -> 2 * x - 1 }

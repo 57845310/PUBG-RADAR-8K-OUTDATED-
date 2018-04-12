@@ -3,23 +3,28 @@ package pubgradar
 import org.pcap4j.core.BpfProgram.BpfCompileMode.OPTIMIZE
 import org.pcap4j.core.PcapNetworkInterface.PromiscuousMode.NONPROMISCUOUS
 import org.pcap4j.core.Pcaps
-import org.pcap4j.packet.*
+import org.pcap4j.packet.IpV4Packet
+import org.pcap4j.packet.Packet
+import org.pcap4j.packet.PppSelector
 import kotlin.concurrent.thread
 import kotlin.experimental.and
 
-const val PPTPFlag: Byte = 0b0011_0000
-const val ACKFlag: Byte = 0b1000_0000.toByte()
+const val PPTPFlag : Byte = 0b0011_0000
+const val ACKFlag : Byte = 0b1000_0000.toByte()
 
-fun ByteArray.toIntBE(pos: Int, num: Int): Int {
+fun ByteArray.toIntBE(pos : Int, num : Int) : Int
+{
   var value = 0
   for (i in 0 until num)
     value = value or ((this[pos + num - 1 - i].toInt() and 0xff) shl 8 * i)
   return value
 }
 
-fun parsePPTPGRE(raw: ByteArray) {
+fun parsePPTPGRE(raw : ByteArray)
+{
   var i = 0
-  if (raw[i] == PPTPFlag) {//PPTP
+  if (raw[i] == PPTPFlag)
+  {//PPTP
     i++
     val hasAck = (raw[i] and ACKFlag) != 0.toByte()
     i++
@@ -32,7 +37,8 @@ fun parsePPTPGRE(raw: ByteArray) {
     i += 2
     val seq = raw.toIntBE(i, 4)
     i += 4
-    if (hasAck) {
+    if (hasAck)
+    {
       val ack = raw.toIntBE(i, 4)
       i += 4
     }
@@ -46,7 +52,8 @@ fun parsePPTPGRE(raw: ByteArray) {
   }
 }
 
-fun main(args: Array<String>) {
+fun main(args : Array<String>)
+{
 //  val raw = byteArrayOf(0x30, 0x81.toByte(), 0x88.toByte(), 0x0b, 0x00, 0x47.toByte(),
 //                        0xe6.toByte(), 0x80.toByte(), 0x00, 0x00, 0x7d, 0x31, 0x00,
 //                        0x00, 0x56, 0xe9.toByte(),
@@ -64,20 +71,23 @@ fun main(args: Array<String>) {
 //    print((byte.toInt() and 0xff).toString(16) + " ")
 //  println()
 //  parsePPTPGRE(raw)
-  
+
   val nif = Pcaps.findAllDevs()[0]
   val handle = nif.openLive(65535, NONPROMISCUOUS, 10)
   handle.setFilter("ip[9]=47", OPTIMIZE)
-  
+
   thread(isDaemon = true) {
-    handle.loop(-1) { packet: Packet? ->
-      try {
+    handle.loop(-1) { packet : Packet? ->
+      try
+      {
         packet!!
         val ipPkt = packet[IpV4Packet::class.java]
         val ipHeader = ipPkt.header
         val raw = ipPkt.payload.rawData
         parsePPTPGRE(raw)
-      } catch (e: Exception) {
+      }
+      catch (e : Exception)
+      {
         e.printStackTrace()
       }
     }

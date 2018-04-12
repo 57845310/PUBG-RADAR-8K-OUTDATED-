@@ -1,8 +1,5 @@
 package pubgradar.deserializer
 
-import javax.crypto.*
-import javax.crypto.spec.*
-
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import org.pcap4j.core.NotOpenException
@@ -16,8 +13,6 @@ import java.nio.charset.Charset
 import kotlin.experimental.and
 import kotlin.experimental.or
 import kotlin.math.min
-
-var encryptionToken : String = ""
 
 val GShift = ByteArray(8) { (1 shl it).toByte() }
 const val zeroByte : Byte = 0
@@ -484,23 +479,6 @@ open class Buffer(
     catch (e : NotOpenException)
     {
       debugln { ("Buffer is throwing : $e ${e.stackTrace} ${e.message} ${e.cause}") }
-    }
-  }
-  
-  fun decrypt(nonce : ByteArray, tag : ByteArray, encrypted : ByteArray) {
-    val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-    val keySpec = SecretKeySpec(encryptionToken.toByteArray(), "AES")
-    val gcm = GCMParameterSpec(128, nonce)
- 
-    cipher.init(Cipher.DECRYPT_MODE, keySpec, gcm)
-    cipher.update(encrypted)
-    cipher.update(tag)
- 
-    try {
-      var newRaw: ByteArray = cipher.doFinal()
-      append(Buffer(newRaw))
-    } catch (e : Exception) {
-      // fix the termination bit
     }
   }
 

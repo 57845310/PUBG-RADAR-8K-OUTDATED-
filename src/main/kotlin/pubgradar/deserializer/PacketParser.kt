@@ -2,6 +2,9 @@
 
 package pubgradar.deserializer
 
+import pubgradar.haveEncryptionToken
+import pubgradar.EncryptionToken
+import pubgradar.missedDecryption
 import pubgradar.deserializer.channel.ActorChannel
 import pubgradar.deserializer.channel.Channel.Companion.closedInChannels
 import pubgradar.deserializer.channel.Channel.Companion.closedOutChannels
@@ -11,6 +14,10 @@ import pubgradar.deserializer.channel.ControlChannel
 import pubgradar.struct.Bunch
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.concurrent.thread
+import kotlin.experimental.and
+import javax.crypto.Cipher
+import javax.crypto.spec.SecretKeySpec
+import javax.crypto.spec.GCMParameterSpec
 
 fun Int.d(w : Int) : String
 {
@@ -36,6 +43,7 @@ fun parsePackets()
   }
 }
 
+/*
 fun proc_raw_packet(raw : ByteArray, client : Boolean = true)
 {
   if (raw.isEmpty()) return
@@ -52,16 +60,92 @@ fun proc_raw_packet(raw : ByteArray, client : Boolean = true)
     reader.proc_raw_packet(client)
   }
 }
+*/
 
-fun Buffer.proc_raw_packet(client : Boolean)
+private fun readRawBit(raw : ByteArray, posBits : Int = 0) : Boolean
 {
-  if (readBit()) return
-  if (readBit() && !encryptionToken.equals("")) {
-    val nonce : ByteArray = readBits(96)
-    val tag : ByteArray = readBits(128)
-    val encrypted : ByteArray = readBits(bitsLeft())
- 
-    decrypt(nonce, tag, encrypted)
+  val GShift = ByteArray(8) { (1 shl it).toByte() }
+  val zeroByte : Byte = 0
+  val b = raw[posBits ushr 3] and GShift[posBits and 0b0111]//x & 0b0111 == x % 8
+  return b != zeroByte
+}
+
+fun proc_raw_packet(raw : ByteArray, client : Boolean = true)
+{
+  if (raw.isEmpty()) return
+  if (readRawBit(raw)) return //IsHandshake
+  var IsEncrypted = readRawBit(raw, 1)
+  if (!IsEncrypted)
+  {
+    var lastByte = raw.last().toInt() and 0xFF
+    if (lastByte != 0)
+    {
+      var bitsize = (raw.size * 8) - 2
+      while ((lastByte and 0x80) == 0)
+      {
+        lastByte *= 2
+        bitsize--
+      }
+      val reader = Buffer(raw, 0, bitsize)
+      reader.proc_raw_packet(client)
+    }
+  }
+  else if (haveEncryptionToken)
+  {
+    var lastByte = raw.last().toInt() and 0xFF
+    if (lastByte != 0)
+    {
+      var bitsize = (raw.size * 8) - 1
+      while ((lastByte and 0x80) == 0)
+      {
+        lastByte *= 2
+        bitsize--
+      }
+      val reader = Buffer(raw, 0, bitsize)
+      val IsHandshake = reader.readBit()
+      IsEncrypted = reader.readBit()
+      val nonce = reader.readBits(96)
+      val tag = reader.readBits(128)
+      val ciphertext = reader.readBits(reader.bitsLeft())
+      val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+      val keySpec = SecretKeySpec(EncryptionToken, "AES")
+      val paramSpec = GCMParameterSpec(128, nonce)
+      cipher.init(Cipher.DECRYPT_MODE, keySpec, paramSpec);
+      cipher.update(ciphertext)
+      try
+      {
+        val plaintext = cipher.doFinal(tag)
+        if (plaintext.isEmpty()) return
+        lastByte = plaintext.last().toInt() and 0xFF
+        if (lastByte != 0)
+        {
+          bitsize = (plaintext.size * 8) - 2
+          while ((lastByte and 0x80) == 0)
+          {
+            lastByte *= 2
+            bitsize--
+          }
+          val reader3 = Buffer(plaintext, 0, bitsize)
+          reader3.proc_raw_packet(client, true)
+        }
+      }
+      catch (e: javax.crypto.AEADBadTagException)
+      {
+        missedDecryption++
+        println("Missed decrypt count $missedDecryption bitsize $bitsize")
+      }
+    }
+  }
+}
+
+fun Buffer.proc_raw_packet(client : Boolean, wasEncrypted : Boolean = false)
+{
+  if (!wasEncrypted)
+  {
+    val IsHandshake = readBit()
+    if (IsHandshake) return
+    val IsEncrypted = readBit()
+    if (IsEncrypted) return
   }
   val packetId = readInt(MAX_PACKETID)
   while (notEnd())
